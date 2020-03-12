@@ -1,23 +1,19 @@
-import datetime
-from astral import Astral
+from datetime import datetime
+from astral.geocoder import database, lookup
+from astral.sun import sun
+from dateutil import tz
 
-city_name = 'Ljubljana'
+loc = lookup("Ljubljana", database())
 
-a = Astral()
-a.solar_depression = 'civil'
+print('Lokacija: %s/%s' % (loc.name, loc.region))
+print('Časovni pas: %s' % loc.timezone)
+print('Zemljepisna širina: %.02f, Zemljepisna dolžina: %.02f\n' % (loc.latitude, loc.longitude))
 
-city = a[city_name]
+date_now = datetime.now()
+s = sun(loc.observer, date=date_now)
 
-print('Lokacija: %s/%s\n' % (city_name, city.region))
-
-timezone = city.timezone
-print('Časovni pas: %s' % timezone)
-
-print('Zemljepisna širina: %.02f; Zemljepisna dolžina: %.02f\n' % (city.latitude, city.longitude))
-datum = datetime.date.today()
-sun = city.sun(date=datum, local=True)
-print("Datum: " + datum.strftime("%d.%m.%Y"))
-print('Zora:         %s' % sun['dawn'].strftime("%H:%M:%S"))
-print('Sončni vzhod: %s' % sun['sunrise'].strftime("%H:%M:%S"))
-print('Sončni zahod: %s' % sun['sunset'].strftime("%H:%M:%S"))
-print('Mrak:         %s' % sun['dusk'].strftime("%H:%M:%S"))
+print("Datum: " + date_now.strftime("%d.%m.%Y"))
+print('Zora:         %s' % s['dawn'].astimezone(tz.tzlocal()).strftime("%H:%M:%S"))
+print('Sončni vzhod: %s' % s['sunrise'].astimezone(tz.tzlocal()).strftime("%H:%M:%S"))
+print('Sončni zahod: %s' % s['sunset'].astimezone(tz.tzlocal()).strftime("%H:%M:%S"))
+print('Mrak:         %s' % s['dusk'].astimezone(tz.tzlocal()).strftime("%H:%M:%S"))

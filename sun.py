@@ -1,23 +1,19 @@
-import datetime
-from astral import Astral
+from datetime import datetime
+from astral.geocoder import database, lookup
+from astral.sun import sun
+from dateutil import tz
 
-city_name = 'London'
+loc = lookup("London", database())
 
-a = Astral()
-a.solar_depression = 'civil'
+print('Location: %s/%s' % (loc.name, loc.region))
+print('Timezone: %s' % loc.timezone)
+print('Latitude: %.02f; Longitute: %.02f\n' % (loc.latitude, loc.longitude))
 
-city = a[city_name]
+date_now = datetime.now()
+s = sun(loc.observer, date=date_now)
 
-print('Location: %s/%s\n' % (city_name, city.region))
-
-timezone = city.timezone
-print('Timezone: %s' % timezone)
-
-print('Latitude: %.02f; Longitute: %.02f\n' % (city.latitude, city.longitude))
-datum = datetime.date.today()
-sun = city.sun(date=datum, local=True)
-print("Date: " + datum.strftime("%d.%m.%Y"))
-print('Dawn:    %s' % sun['dawn'].strftime("%H:%M:%S"))
-print('Sunrise: %s' % sun['sunrise'].strftime("%H:%M:%S"))
-print('Sunset:  %s' % sun['sunset'].strftime("%H:%M:%S"))
-print('Dusk:    %s' % sun['dusk'].strftime("%H:%M:%S"))
+print("Date: " + date_now.strftime("%d.%m.%Y"))
+print('Dawn:    %s' % s['dawn'].astimezone(tz.tzlocal()).strftime("%H:%M:%S"))
+print('Sunrise: %s' % s['sunrise'].astimezone(tz.tzlocal()).strftime("%H:%M:%S"))
+print('Sunset:  %s' % s['sunset'].astimezone(tz.tzlocal()).strftime("%H:%M:%S"))
+print('Dusk:    %s' % s['dusk'].astimezone(tz.tzlocal()).strftime("%H:%M:%S"))
